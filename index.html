@@ -1,363 +1,457 @@
-<!DOCTYPE html>
+from pathlib import Path
+
+from zipfile import ZipFile, ZIP_DEFLATED
+
+import shutil, os
+
+base = Path("/mnt/data/portfolio_website")
+
+base.mkdir(exist_ok=True)
+
+# Copy the two uploaded portraits using the exact mounted paths.
+
+shutil.copy2("/mnt/data/56730E02-2F52-4BB7-9820-B3CF1BF760B8.jpeg", base / "palita.jpeg")
+
+shutil.copy2("/mnt/data/82CFD2C4-F763-4BFA-9850-1A4B43C7F567.jpeg", base / "punyanut.jpeg")
+
+html = r'''<!DOCTYPE html>
+
 <html lang="th">
 
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>My Portfolio</title>
+<title>TCASFOLIO | แฟ้มสะสมผลงาน</title>
 
 <style>
 
-/* ตั้งค่าพื้นฐาน */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: sans-serif;
+:root{
+
+  --purple:#5b168f; --deep:#39005f; --lavender:#f5efff;
+
+  --light:#ead8ff; --accent:#b76cf2; --text:#30283a; --white:#fff;
+
 }
 
-html {
-    scroll-behavior: smooth;
+*{box-sizing:border-box;margin:0;padding:0}
+
+html{scroll-behavior:smooth}
+
+body{font-family:Tahoma,Arial,sans-serif;background:var(--lavender);color:var(--text);line-height:1.8}
+
+header{
+
+  text-align:center;color:white;padding:68px 20px 58px;
+
+  background:linear-gradient(125deg,#5b0b91,#a64be0,#d29bff)
+
 }
 
-body {
-    background: #f5efff;
-    color: #333;
+header h1{font-size:clamp(2.1rem,6vw,3.7rem);letter-spacing:1px;line-height:1.25}
+
+header .subtitle{font-size:1.2rem;margin-top:8px}
+
+header .program{font-size:1rem;margin-top:8px}
+
+nav{
+
+  position:sticky;top:0;z-index:10;background:var(--deep);
+
+  display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:12px
+
 }
 
-/* ส่วนหัวเว็บไซต์ */
-header {
-    background: linear-gradient(120deg, #7200b5, #c084fc);
-    color: white;
-    text-align: center;
-    padding: 65px 20px;
+nav a{color:#fff;text-decoration:none;padding:7px 12px;border-radius:20px;font-weight:bold}
+
+nav a:hover{background:#7c27b7}
+
+main{max-width:1100px;margin:auto;padding:0 20px}
+
+section{padding:48px 0;scroll-margin-top:76px}
+
+.section-title{font-size:1.8rem;color:var(--purple);text-align:center;border-bottom:3px solid var(--accent);padding-bottom:10px;margin-bottom:28px}
+
+.intro{text-align:center;margin:20px auto 0;max-width:780px}
+
+.profiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;max-width:800px;margin:30px auto}
+
+.profile-card,.card,.activity-card,.award-card{
+
+  background:var(--white);border-radius:18px;padding:24px;
+
+  box-shadow:0 6px 20px rgba(65,25,95,.09)
+
 }
 
-header h1 {
-    font-size: 48px;
-    margin-bottom: 15px;
-}
+.profile-card{text-align:center}
 
-header p {
-    font-size: 20px;
-    margin: 10px;
-}
+.profile-card img{width:210px;height:210px;max-width:100%;object-fit:cover;border-radius:50%;border:6px solid var(--accent);display:block;margin:0 auto 16px}
 
-/* เมนู */
-nav {
-    background: #4b0082;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 15px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+.profile-card h3{color:var(--purple);font-size:1.15rem}
 
-nav a {
-    color: white;
-    text-decoration: none;
-    margin: 8px 18px;
-    font-size: 18px;
-    font-weight: bold;
-}
+.profile-card p{font-size:.95rem;color:#665b70}
 
-nav a:hover {
-    color: #e9c5ff;
-}
+.info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 
-/* ส่วนเนื้อหา */
-section {
-    padding: 50px 25px;
-    max-width: 1100px;
-    margin: auto;
-}
+.info-item{padding:13px 15px;background:#faf7ff;border-radius:12px}
 
-h2 {
-    color: #7200b5;
-    text-align: center;
-    font-size: 30px;
-    margin-bottom: 25px;
-    border-bottom: 3px solid #c084fc;
-    padding-bottom: 15px;
-}
+.info-item strong{color:var(--purple)}
 
-/* รูปโปรไฟล์ */
-.profile-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 45px;
-    flex-wrap: wrap;
-    margin-top: 30px;
-}
+blockquote{border-left:5px solid var(--accent);padding:15px 20px;background:#fbf8ff;border-radius:0 12px 12px 0;margin:15px 0}
 
-.profile-item {
-    background: white;
-    width: 350px;
-    padding: 25px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 
-.profile-item img {
-    width: 220px;
-    height: 220px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 6px solid #a855f7;
-    margin-bottom: 18px;
-}
+.card h3,.activity-card h3,.award-card h3{color:var(--purple);margin-bottom:8px}
 
-.profile-item h3 {
-    color: #5b168f;
-    font-size: 20px;
-    margin-bottom: 10px;
-}
+.card p,.activity-card p,.award-card p{margin:5px 0}
 
-/* กล่องข้อมูล */
-.card {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    margin-top: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    line-height: 2;
-    font-size: 18px;
-}
+.tag{display:inline-block;background:#f0e0ff;color:var(--purple);padding:3px 10px;border-radius:20px;font-size:.88rem;margin:4px 4px 4px 0}
 
-/* กิจกรรม */
-.activity-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 20px;
-}
+ul{padding-left:22px}
 
-.activity {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
+footer{text-align:center;background:var(--deep);color:white;padding:25px 15px;margin-top:25px}
 
-.activity h3 {
-    color: #7200b5;
-    margin-bottom: 10px;
-}
+.small-note{font-size:.9rem;color:#6d6177}
 
-/* ติดต่อ */
-.contact {
-    text-align: center;
-    line-height: 2.2;
-}
+@media(max-width:700px){
 
-/* ส่วนท้าย */
-footer {
-    background: #4b0082;
-    color: white;
-    text-align: center;
-    padding: 25px;
-    margin-top: 30px;
-}
+  .profiles,.info-grid,.cards{grid-template-columns:1fr}
 
-/* รองรับโทรศัพท์ */
-@media screen and (max-width: 600px) {
+  .profile-card img{width:190px;height:190px}
 
-    header h1 {
-        font-size: 34px;
-    }
+  nav{gap:2px}
 
-    nav a {
-        font-size: 15px;
-        margin: 8px;
-    }
+  nav a{font-size:.9rem;padding:6px 8px}
 
-    .profile-item {
-        width: 100%;
-    }
+  main{padding:0 15px}
 
-    .profile-item img {
-        width: 190px;
-        height: 190px;
-    }
-
-    section {
-        padding: 35px 15px;
-    }
+  section{padding:35px 0}
 
 }
 
 </style>
+
 </head>
 
 <body>
 
-<!-- ส่วนหัว -->
 <header>
 
-    <h1>MY PORTFOLIO</h1>
+  <h1>TCASFOLIO</h1>
 
-    <p>แฟ้มสะสมผลงาน</p>
+  <div class="subtitle">แฟ้มสะสมผลงาน ประจำปี 2570</div>
 
-    <p>คณะวิทยาการสุขภาพและการกีฬา</p>
+  <div class="program">มหาวิทยาลัยเกษตรศาสตร์ · คณะบริหารธุรกิจ</div>
+
+  <div class="program">บริหารธุรกิจบัณฑิต · โครงการช้างเผือก (รอบ 1.1)</div>
 
 </header>
 
-
-<!-- เมนู -->
 <nav>
 
-    <a href="#profile">ประวัติส่วนตัว</a>
+  <a href="#profile">ข้อมูลผู้สมัคร</a>
 
-    <a href="#education">ประวัติการศึกษา</a>
+  <a href="#education">การศึกษา</a>
 
-    <a href="#activity">กิจกรรม</a>
+  <a href="#essay">เหตุผลในการสมัคร</a>
 
-    <a href="#contact">ติดต่อ</a>
+  <a href="#awards">รางวัล</a>
+
+  <a href="#activities">กิจกรรม</a>
+
+  <a href="#training">การอบรม</a>
+
+  <a href="#contact">ติดต่อ</a>
 
 </nav>
 
+<main>
 
-<!-- ประวัติส่วนตัว -->
 <section id="profile">
 
-    <h2>ประวัติส่วนตัว</h2>
+  <h2 class="section-title">หมวด 1 · ข้อมูลผู้สมัคร</h2>
 
-    <div class="profile-container">
+  <div class="profiles">
 
-        <!-- คนที่ 1 -->
-        <div class="profile-item">
+    <article class="profile-card">
 
-            <img src="palita.jpeg"
-            alt="นางสาวปาลิตา ระวัง">
+      <img src="palita.jpeg" alt="รูปนางสาวปาลิตา ระวัง">
 
-            <h3>นางสาวปาลิตา ระวัง</h3>
+      <h3>นางสาวปาลิตา ระวัง</h3>
 
-        </div>
+      <p>Palita Rawang</p>
 
+      <span class="tag">ผู้สมัคร</span>
 
-        <!-- คนที่ 2 -->
-        <div class="profile-item">
+    </article>
 
-            <img src="punyanut.jpeg"
-            alt="นางสาวปุณยนุช ทองสัมฤทธิ์">
+    <article class="profile-card">
 
-            <h3>นางสาวปุณยนุช ทองสัมฤทธิ์</h3>
+      <img src="punyanut.jpeg" alt="รูปนางสาวปุณยนุช ทองสัมฤทธิ์">
 
-        </div>
+      <h3>นางสาวปุณยนุช ทองสัมฤทธิ์</h3>
+
+      <p>แฟ้มสะสมผลงาน</p>
+
+      <span class="tag">ผู้ร่วมจัดทำเว็บไซต์</span>
+
+    </article>
+
+  </div>
+
+  <div class="card">
+
+    <h3>ข้อมูลส่วนตัวและความสนใจ</h3>
+
+    <div class="info-grid">
+
+      <div class="info-item"><strong>ชื่อผู้สมัคร:</strong> นางสาวปาลิตา ระวัง</div>
+
+      <div class="info-item"><strong>ชื่อภาษาอังกฤษ:</strong> Palita Rawang</div>
+
+      <div class="info-item"><strong>สถานศึกษา:</strong> โรงเรียนทุ่งใหญ่เฉลิมราชอนุสรณ์ รัชมังคลาภิเษก</div>
+
+      <div class="info-item"><strong>จังหวัด:</strong> นครศรีธรรมราช</div>
+
+      <div class="info-item"><strong>หลักสูตร:</strong> หลักสูตรแกนกลาง (สามัญ)</div>
+
+      <div class="info-item"><strong>ปีการศึกษา:</strong> 2569</div>
+
+      <div class="info-item"><strong>ผลการเรียนเฉลี่ยสะสม 4 ภาคเรียน:</strong> 3.87</div>
+
+      <div class="info-item"><strong>สาขาที่สนใจ:</strong> ธุรกิจและการตลาด</div>
 
     </div>
 
+    <p class="small-note" style="margin-top:14px">หมายเหตุ: เว็บไซต์นี้แสดงเฉพาะข้อมูลที่เหมาะสำหรับเผยแพร่ในแฟ้มสะสมผลงาน โดยไม่แสดงเลขประจำตัวประชาชน ที่อยู่ เบอร์โทรศัพท์ หรือข้อมูลผู้ปกครอง</p>
+
+  </div>
+
 </section>
 
-
-<!-- ประวัติการศึกษา -->
 <section id="education">
 
-    <h2>ประวัติการศึกษา</h2>
+  <h2 class="section-title">หมวด 1 · ประวัติการศึกษา</h2>
 
-    <div class="card">
+  <div class="card">
 
-        <p>
-        <b>ระดับประถมศึกษา :</b>
-        โรงเรียนไพบูลย์วิทยา
-        </p>
+    <p><strong>โรงเรียน:</strong> ทุ่งใหญ่เฉลิมราชอนุสรณ์ รัชมังคลาภิเษก จังหวัดนครศรีธรรมราช</p>
 
-        <p>
-        <b>ระดับมัธยมศึกษาตอนต้น :</b>
-        โรงเรียนทุ่งใหญ่เฉลิมราชอนุสรณ์ รัชมังคลาภิเษก
-        </p>
+    <p><strong>หลักสูตร:</strong> หลักสูตรแกนกลาง (สามัญ) · ปีการศึกษา 2569</p>
 
-        <p>
-        <b>ระดับมัธยมศึกษาตอนปลาย :</b>
-        โรงเรียนทุ่งใหญ่เฉลิมราชอนุสรณ์ รัชมังคลาภิเษก
-        </p>
+    <p><strong>GPAX 4 ภาคเรียน:</strong> 3.87</p>
 
-        <p>
-        <b>แผนการเรียน :</b>
-        วิทยาศาสตร์-คณิตศาสตร์
-        </p>
+    <h3 style="color:var(--purple);margin:18px 0 10px">ผลการเรียนรายกลุ่มสาระ</h3>
 
-        <p>
-        <b>เกรดเฉลี่ยสะสม :</b>
-        3.55
-        </p>
+    <div class="info-grid">
 
-    </div>
+      <div class="info-item">ภาษาไทย — GPA 3.75</div>
 
-</section>
+      <div class="info-item">คณิตศาสตร์ — GPA 3.95</div>
 
+      <div class="info-item">วิทยาศาสตร์ — GPA 3.79</div>
 
-<!-- กิจกรรม -->
-<section id="activity">
+      <div class="info-item">สังคมศึกษา ศาสนา และวัฒนธรรม — GPA 3.94</div>
 
-    <h2>กิจกรรมและผลงาน</h2>
+      <div class="info-item">สุขศึกษาและพลศึกษา — GPA 3.75</div>
 
-    <div class="activity-container">
+      <div class="info-item">ศิลปะ — GPA 4.00</div>
 
-        <div class="activity">
+      <div class="info-item">การงานอาชีพและเทคโนโลยี — GPA 4.00</div>
 
-            <h3>กิจกรรมที่ 1</h3>
-
-            <p>ปลูกป่าชายเลน</p>
-
-        </div>
-
-
-        <div class="activity">
-
-            <h3>กิจกรรมที่ 2</h3>
-
-            <p>กิจกรรมจิตอาสาเก็บขยะ</p>
-
-        </div>
-
-
-        <div class="activity">
-
-            <h3>กิจกรรมที่ 3</h3>
-
-            <p>กิจกรรม To Be NUMBER ONE</p>
-
-        </div>
+      <div class="info-item">ภาษาต่างประเทศ — GPA 3.93</div>
 
     </div>
 
+  </div>
+
 </section>
 
+<section id="essay">
 
-<!-- ติดต่อ -->
+  <h2 class="section-title">หมวด 2 · เรียงความ / เหตุผลในการสมัคร</h2>
+
+  <div class="card">
+
+    <blockquote>“บางครั้งสิ่งที่เราชอบ อาจเริ่มต้นจากเรื่องเล็ก ๆ ที่เราไม่เคยคิดว่าวันหนึ่งจะกลายเป็นความฝัน”</blockquote>
+
+    <p>สำหรับดิฉัน จุดเริ่มต้นของความสนใจด้านธุรกิจและการตลาดเกิดขึ้นจากเรื่องเล็ก ๆ ในช่วงวัยเด็ก ในช่วงปิดเทอม ดิฉันมักมีโอกาสได้ช่วยญาติทำงานที่ร้านค้า ทั้งการซื้อของเข้าร้าน จัดสินค้า และคิดเงินอยู่บ่อย ๆ แม้ในตอนนั้นดิฉันจะมองว่าเป็นเพียงการช่วยงาน แต่กลับรู้สึกสนุกกับการได้ทำงานและได้เห็นการซื้อขายภายในร้าน ประสบการณ์เล็ก ๆ เหล่านี้ค่อย ๆ สะสมเป็นความสนใจ จนเมื่อเข้าสู่ช่วงมัธยมศึกษา ดิฉันได้มีโอกาสทำกิจกรรมที่เกี่ยวข้องกับธุรกิจและการขายมากขึ้น จึงเริ่มมองเห็นว่าความชอบที่มีมาตั้งแต่เด็กอาจเป็นสิ่งที่ดิฉันต้องการศึกษาและพัฒนาต่ออย่างจริงจัง และกลายเป็นจุดเปลี่ยนที่ทำให้ดิฉันค้นพบว่าตนเองสนใจด้านการตลาด</p>
+
+    <p>ในช่วงมัธยมศึกษา ดิฉันได้มีโอกาสทำกิจกรรมที่เกี่ยวข้องกับธุรกิจมากขึ้น ทั้งการเป็นคณะกรรมการนักเรียนและมีส่วนร่วมในการจัดตลาดของโรงเรียน ตั้งแต่การเตรียมสินค้า จัดร้าน ขายสินค้า ไปจนถึงการให้บริการลูกค้า นอกจากนี้ ดิฉันยังได้เข้าร่วมการแข่งขันอัจฉริยะทางธุรกิจ ซึ่งทำให้ได้ฝึกคิด วิเคราะห์ และมองธุรกิจในมุมที่มากกว่าการขายสินค้าเพียงอย่างเดียว ดิฉันเริ่มสนใจว่าทำอย่างไรจึงจะทำให้สินค้าเป็นที่สนใจและตอบโจทย์ความต้องการของผู้บริโภค ประสบการณ์เหล่านี้ทำให้ดิฉันรู้สึกสนุกและมั่นใจมากขึ้นว่าต้องการศึกษาต่อในด้านการตลาด</p>
+
+    <p>ดิฉันสนใจเข้าศึกษาที่มหาวิทยาลัยเกษตรศาสตร์ เพราะต้องการพัฒนาความรู้ด้านการตลาดให้เป็นระบบ ทั้งด้านการวิเคราะห์ผู้บริโภค การวางแผนการตลาด และการนำความรู้ไปประยุกต์ใช้กับสถานการณ์จริง ดิฉันเชื่อว่าการได้เรียนรู้ในสภาพแวดล้อมของมหาวิทยาลัยจะช่วยเปิดมุมมองใหม่ ๆ และพัฒนาทั้งความรู้ ทักษะ และประสบการณ์ที่จำเป็นต่อการทำงานด้านธุรกิจและการตลาด</p>
+
+    <p>ในอนาคต ดิฉันอยากนำความรู้ด้านการตลาดไปต่อยอดในการทำงานและสร้างธุรกิจของตนเอง โดยเฉพาะการสร้างแบรนด์และพัฒนาสินค้าให้สามารถเข้าถึงผู้บริโภคได้ ดิฉันตั้งใจที่จะเริ่มต้นจากการเรียนรู้และเก็บเกี่ยวประสบการณ์จากการทำงานจริง ก่อนนำความรู้และประสบการณ์เหล่านั้นมาต่อยอดเป็นธุรกิจของตนเอง ดิฉันเชื่อว่าการได้ศึกษาด้านการตลาดที่มหาวิทยาลัยเกษตรศาสตร์จะเป็นก้าวสำคัญที่ทำให้ความชอบที่เริ่มต้นจากเรื่องเล็ก ๆ ในวัยเด็ก เติบโตขึ้นเป็นความรู้ ความสามารถ และความฝันที่สามารถเกิดขึ้นได้จริง</p>
+
+  </div>
+
+</section>
+
+<section id="awards">
+
+  <h2 class="section-title">หมวด 4.1 · รางวัล / เกียรติบัตร</h2>
+
+  <div class="cards">
+
+    <article class="award-card">
+
+      <h3>การแข่งขันอัจฉริยะทางธุรกิจ</h3>
+
+      <span class="tag">รางวัลระดับเหรียญเงิน</span>
+
+      <p><strong>วันที่:</strong> 12–13 มกราคม 2569</p>
+
+      <p>เข้าร่วมการแข่งขันอัจฉริยะทางธุรกิจ ระดับชั้น ม.4–ม.6 เป็นครั้งแรก และตั้งใจทบทวนเตรียมตัวอย่างต่อเนื่องจนได้รับรางวัลระดับเหรียญเงิน ประสบการณ์นี้ทำให้เรียนรู้ว่าความสำเร็จเกิดจากความตั้งใจและการเตรียมตัวอย่างสม่ำเสมอ</p>
+
+    </article>
+
+    <article class="award-card">
+
+      <h3>การประกวดโครงงานคุณธรรม</h3>
+
+      <span class="tag">เหรียญทอง รองชนะเลิศอันดับ 1</span>
+
+      <p><strong>วันที่:</strong> 12–13 มกราคม 2569</p>
+
+      <p>รับหน้าที่เป็นผู้นำเสนอผลงาน ได้พัฒนาทักษะการสื่อสาร การพูดต่อหน้าสาธารณชน การตอบข้อซักถาม การทำงานเป็นทีม และการแก้ไขปัญหาเฉพาะหน้า</p>
+
+    </article>
+
+  </div>
+
+</section>
+
+<section id="activities">
+
+  <h2 class="section-title">หมวด 4.3 · กิจกรรม</h2>
+
+  <div class="cards">
+
+    <article class="activity-card"><h3>1. กิจกรรมสภานักเรียน</h3><p><strong>ปี:</strong> 2568</p><p>ได้รับเลือกเป็นคณะกรรมการนักเรียน มีส่วนร่วมคิดและดำเนินนโยบาย เช่น โบว์กิ๊ฟติดผมนักเรียนและปกสมุดโรงเรียน รวมถึงร่วมจัดกิจกรรมและจำหน่ายสินค้า ฝึกการวางแผน ประสานงาน และแก้ไขปัญหา</p></article>
+
+    <article class="activity-card"><h3>2. ขายของในงานกีฬาสานสัมพันธ์</h3><p><strong>วันที่:</strong> 25 ธันวาคม 2568</p><p>เป็นตัวแทนจำหน่ายลูกชิ้นและน้ำ มีส่วนร่วมเตรียมสินค้า จัดร้าน ขายและบริการลูกค้า ฝึกสังเกตความต้องการและปรับแผนเมื่อสินค้าไม่เพียงพอ</p></article>
+
+    <article class="activity-card"><h3>3. จัดตลาดขายของ</h3><p><strong>วันที่:</strong> 30 ธันวาคม 2568</p><p>ร่วมจัดตลาดวันปีใหม่ในนามสภานักเรียน รับหน้าที่ขายปูนพลาสเตอร์ ช่วยเตรียมและประชาสัมพันธ์สินค้า จนขายหมดและได้กำไรตามเป้าหมาย</p></article>
+
+    <article class="activity-card"><h3>4. ขายของในงานหนังกลางแปลง</h3><p><strong>วันที่:</strong> 20 มิถุนายน 2569</p><p>ร่วมเปิดร้านขายขนมจาก ลูกชิ้นนึ่ง และน้ำเปล่า ได้ฝึกสื่อสารกับลูกค้าที่หลากหลายและเรียนรู้การขายในสถานการณ์จริง</p></article>
+
+    <article class="activity-card"><h3>5. ค่ายอบรมเชิงปฏิบัติการคณะกรรมการนักเรียน</h3><p><strong>วันที่:</strong> 20–22 มีนาคม 2569</p><p>เข้าร่วมค่ายเพื่อพัฒนาทักษะความเป็นผู้นำ การทำงานร่วมกับผู้อื่น การสื่อสาร และการแก้ไขปัญหาเฉพาะหน้า</p></article>
+
+    <article class="activity-card"><h3>6. ค่ายพัฒนาศักยภาพสภานักเรียน</h3><p><strong>วันที่:</strong> 15–16 พฤศจิกายน 2568</p><p>เรียนรู้การค้นหาตัวตนผ่านกิจกรรมและการทำงานกลุ่ม ฝึกสื่อสาร รับฟังความคิดเห็น และเข้าใจจุดแข็งของตนเอง</p></article>
+
+    <article class="activity-card"><h3>7. วิทยากรร่วมอบรมค่ายคุณธรรม</h3><p><strong>วันที่:</strong> 23 มิถุนายน 2569</p><p>ทำหน้าที่พี่ประจำกลุ่ม พาน้อง ๆ เข้าร่วมกิจกรรม สาธิตเกม อธิบายกติกา และช่วยเหลือระหว่างกิจกรรม ฝึกปรับวิธีสื่อสารให้เหมาะกับแต่ละคน</p></article>
+
+    <article class="activity-card"><h3>8. รองประธานคณะสี</h3><p><strong>ปี:</strong> 2568</p><p>มีส่วนร่วมวางแผนและจัดเตรียมกิจกรรมของคณะสี ประสานงานกับสมาชิก และดูแลงานที่ได้รับมอบหมาย</p></article>
+
+    <article class="activity-card"><h3>9. ตัวแทนถือป้ายโรงเรียนและส่งมอบเหรียญรางวัล</h3><p><strong>ปี:</strong> 2569</p><p>ปฏิบัติหน้าที่ตัวแทนถือป้ายโรงเรียนและส่งมอบเหรียญรางวัลแก่นักกีฬา เรียนรู้การเตรียมตัวและรักษาความพร้อมตามเวลาที่กำหนด</p></article>
+
+    <article class="activity-card"><h3>10. ตัวแทนนักเรียนต้อนรับรองผู้อำนวยการโรงเรียน</h3><p><strong>วันที่:</strong> 10 กรกฎาคม 2569</p><p>เป็นตัวแทนถือป้ายคำขวัญโรงเรียนในขบวนต้อนรับ ฝึกความมั่นใจและการวางตัวในฐานะตัวแทนของโรงเรียน</p></article>
+
+    <article class="activity-card"><h3>11. ตัวแทนนักเรียนต้อนรับผู้อำนวยการสำนักงานเขตพื้นที่ฯ</h3><p><strong>ปี:</strong> พฤศจิกายน 2568</p><p>ได้รับเลือกเป็นตัวแทนนักเรียนชั้น ม.5 ในการยืนต้อนรับ ฝึกความรับผิดชอบ บุคลิกภาพ และการปฏิบัติหน้าที่ในฐานะตัวแทนนักเรียน</p></article>
+
+    <article class="activity-card"><h3>12. ตัวแทนสภาร่วมดำเนินกิจกรรมวันอาเซียน</h3><p><strong>ปี:</strong> สิงหาคม 2569</p><p>ช่วยถือธงและร่วมจัดตลาดวันอาเซียน มีส่วนร่วมเตรียมงานและดำเนินกิจกรรม ฝึกการออกแบบกิจกรรมให้ตอบโจทย์ผู้เข้าร่วมและทำงานร่วมกับผู้อื่น</p></article>
+
+  </div>
+
+</section>
+
+<section id="training">
+
+  <h2 class="section-title">หมวด 4.4 · การอบรม / การเรียนเพิ่มทักษะ</h2>
+
+  <div class="cards">
+
+    <article class="card">
+
+      <h3>การฝึกงานธนาคาร ธ.ก.ส.</h3>
+
+      <p><strong>วันที่:</strong> 9–13 มีนาคม 2569</p>
+
+      <p>ฝึกงานที่ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร สาขาถ้ำพรรณรา ได้เรียนรู้การทำงานจริง ช่วยจัดเรียงเอกสารและแฟ้มข้อมูล ตรวจสอบและสรุปยอดเงินเบี้ยยังชีพผู้สูงอายุ ต้อนรับผู้ใช้บริการ และช่วยผู้สูงอายุกดบัตรคิว</p>
+
+    </article>
+
+    <article class="card">
+
+      <h3>อบรมชมรม TO BE NUMBER ONE</h3>
+
+      <p><strong>วันที่:</strong> 10–12 มิถุนายน 2569</p>
+
+      <p>เข้าร่วมอบรมโครงการรณรงค์ป้องกันและแก้ไขปัญหายาเสพติด กิจกรรมสร้างเครือข่าย “ศูนย์เพื่อนใจ TO BE NUMBER ONE” ในฐานะสมาชิกชมรมและเหรัญญิก เรียนรู้การป้องกันปัญหายาเสพติดและการทำงานร่วมกับผู้อื่น</p>
+
+    </article>
+
+  </div>
+
+</section>
+
+<section id="creative">
+
+  <h2 class="section-title">หมวด 4.5 · ผลงานสร้างสรรค์</h2>
+
+  <div class="card">
+
+    <h3>การคิดและตัดต่อ MV</h3>
+
+    <p><strong>ช่วงเวลา:</strong> มกราคม 2568</p>
+
+    <p>เป็นผู้คิดและวางโครงเรื่อง MV ตั้งแต่เริ่มต้น กำหนดแนวทางและลำดับการดำเนินเรื่อง รวมถึงรับผิดชอบการตัดต่อและเรียบเรียงวิดีโอให้มีความต่อเนื่อง โดยทำงานร่วมกับเพื่อน ๆ ที่รับหน้าที่แสดง</p>
+
+    <p><strong>ลิงก์ผลงาน:</strong> <a href="https://youtu.be/dIHkzKjx4qY?feature=shared" target="_blank" rel="noopener">รับชมผลงาน MV</a></p>
+
+  </div>
+
+</section>
+
 <section id="contact">
 
-    <h2>ช่องทางการติดต่อ</h2>
+  <h2 class="section-title">ติดต่อ</h2>
 
-    <div class="card contact">
+  <div class="card" style="text-align:center">
 
-        <p>สามารถติดต่อสอบถามเพิ่มเติมได้ที่</p>
+    <p>ขอบพระคุณคณะกรรมการที่ให้ความสนใจแฟ้มสะสมผลงาน</p>
 
-        <p>Facebook : ใส่ชื่อ Facebook Punyanut Thongsamrit</p>
+    <p class="small-note">สามารถเพิ่มช่องทางติดต่อที่ต้องการเผยแพร่ได้ในส่วนนี้</p>
 
-        <p>Instagram : ใส่ชื่อ Instagram punyanutt_19</p>
-
-        <p>Email : ใส่อีเมลtlaend61@gmail.com</p>
-
-    </div>
+  </div>
 
 </section>
 
+</main>
 
-<!-- ส่วนท้าย -->
 <footer>
 
-    <p>MY PORTFOLIO</p>
+  <p>TCASFOLIO · แฟ้มสะสมผลงาน ประจำปี 2570</p>
 
-    <p>แฟ้มสะสมผลงาน</p>
+  <p>มหาวิทยาลัยเกษตรศาสตร์ · คณะบริหารธุรกิจ</p>
 
 </footer>
 
 </body>
+
 </html>
+
+'''
+
+(base / "index.html").write_text(html, encoding="utf-8")
+
+zip_path = Path("/mnt/data/TCASFOLIO_website_with_photos.zip")
+
+with ZipFile(zip_path, "w", ZIP_DEFLATED) as z:
+
+    for p in base.iterdir():
+
+        z.write(p, arcname=p.name)
+
+html_path = Path("/mnt/data/index.html")
+
+html_path.write_text(html, encoding="utf-8")
+
+print("สร้างไฟล์เว็บไซต์และแพ็กเกจพร้อมรูปภาพแล้ว")
+
+print(f"HTML: {html_path}")
+
+print(f"ZIP: {zip_path}")
