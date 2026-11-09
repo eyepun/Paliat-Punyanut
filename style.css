@@ -1,0 +1,150 @@
+/* ตั้งค่าพื้นฐาน */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Prompt', sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    background: linear-gradient(135deg, #f3e5f5, #ede7f6);
+    color: #333;
+}
+
+/* ส่วนหัวเว็บไซต์ */
+header {
+    background: linear-gradient(135deg, #4b0082, #9b59b6, #e1bee7);
+    color: white;
+    text-align: center;
+    padding: 70px 20px;
+}
+
+header h1 {
+    font-size: 45px;
+    letter-spacing: 3px;
+}
+
+header p {
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+/* เมนู */
+nav {
+    background: #4b0082;
+    padding: 18px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 15px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+nav a:hover {
+    color: #ffccff;
+}
+
+/* เนื้อหา */
+section {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 30px;
+}
+
+/* หัวข้อ */
+h2 {
+    color: #6a1b9a;
+    font-size: 28px;
+    margin-bottom: 25px;
+    border-left: 6px solid #ba68c8;
+    padding-left: 15px;
+}
+
+/* รูปโปรไฟล์ */
+.profile img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid white;
+    box-shadow: 0 5px 20px #b39ddb;
+    transition: 0.4s;
+}
+
+.profile img:hover {
+    transform: scale(1.08);
+}
+
+/* กล่องข้อมูล */
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 20px rgba(100, 50, 150, 0.15);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(100, 50, 150, 0.25);
+}
+
+/* รูปกิจกรรม */
+.card img {
+    width: 100%;
+    max-width: 350px;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+
+/* ปุ่ม */
+button {
+    background: linear-gradient(135deg, #7b1fa2, #ce93d8);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: #4b0082;
+}
+
+/* ส่วนท้าย */
+footer {
+    background: #4b0082;
+    color: white;
+    text-align: center;
+    padding: 25px;
+    margin-top: 50px;
+}
+
+/* รองรับโทรศัพท์ */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 30px;
+    }
+
+    nav a {
+        display: inline-block;
+        margin: 8px;
+        font-size: 13px;
+    }
+
+    section {
+        padding: 20px;
+    }
+}
