@@ -1,1 +1,1 @@
-# Paliat-Punyanut
+# Palita-Punyanut
